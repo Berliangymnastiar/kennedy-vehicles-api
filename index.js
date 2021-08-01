@@ -50,7 +50,9 @@ app.post("/vehicles", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
 // GET DATA VEHICLE BY HIGH RATING
@@ -62,10 +64,12 @@ app.get("/vehicles/rating", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
-// GET DATA BY ID
+// GET DATA VEHICLE BY ID
 app.get("/vehicle/:id", (req, res) => {
   const { params } = req;
 
@@ -123,7 +127,25 @@ app.get("/users", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// GET DATA BY USER ID
+app.get("/user/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString = "SELECT * FROM users WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, params.id, (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
 // CREATE DATA USERS
@@ -136,7 +158,41 @@ app.post("/users", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// UPDATE USER BY ID
+app.patch("/user/:id", (req, res) => {
+  const { body, params } = req;
+
+  const queryString = "UPDATE users SET ? WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [body, params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// DELETE DATA USER BY ID
+app.delete("/user/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString = "DELETE FROM users WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
 // GET DATA CATEGORIES
@@ -149,7 +205,25 @@ app.get("/categories", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// GET CATEGORY BY ID
+app.get("/category/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString = "SELECT * FROM categories WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, params.id, (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
 // CREATE DATA CATEGORIES
@@ -163,7 +237,41 @@ app.post("/categories", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// UPDATE CATEGORY BY ID
+app.patch("/category/:id", (req, res) => {
+  const { body, params } = req;
+
+  const queryString = "UPDATE categories SET ? WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [body, params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// DELETE CATEGORY BY ID
+app.delete("/category/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString = "DELETE FROM categories WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
 // GET DATA TRANSACTIONS / HISTORY
@@ -177,9 +285,29 @@ app.get("/transactions", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
 
+// GET TRANSACTION BY ID
+app.get("/transaction/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString =
+    "SELECT u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE t.id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, params.id, (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// CREATE TRANSACTIONS
 app.post("/transactions", (req, res) => {
   const { body } = req;
 
@@ -190,5 +318,38 @@ app.post("/transactions", (req, res) => {
       return resolve(results);
     });
   });
-  queryPromise.then((data) => res.json(data)).catch((err) => res.json(err));
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// UPDATE TRANSACTION
+app.patch("/transaction/:id", (req, res) => {
+  const { body, params } = req;
+
+  const queryString = "UPDATE transactions SET ? WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [body, params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+app.delete("/transaction/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString = "DELETE FROM transactions WHERE id = ?";
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, [params.id], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
 });
