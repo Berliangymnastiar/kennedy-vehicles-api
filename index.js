@@ -15,6 +15,7 @@ app.listen(port, () => {
 
 // connect to db
 const mysql = require("mysql");
+
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE } = process.env;
 const db = mysql.createConnection({
   host: DB_HOST,
@@ -23,13 +24,34 @@ const db = mysql.createConnection({
   database: DB_DATABASE,
 });
 
-// GET DATA VEHICLES
+// GET DATA AND FIND DATA
 app.get("/vehicles", (req, res) => {
-  const queryString =
-    'SELECT v.id, v.vehicle_name, v.rating, v.price, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id';
+  const { query } = req;
+  let queryString =
+    "SELECT v.id, v.vehicle_name, v.rating, v.price, c.name AS 'category_name' FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE vehicle_name LIKE '%?%' ORDER BY v.rating DESC";
+  let inputValue = "";
+  if (query?.vehicle_name) inputValue = query.vehicle_name;
 
   const queryPromise = new Promise((resolve, reject) => {
-    db.query(queryString, (err, results) => {
+    db.query(queryString, mysql.raw(`${inputValue}`), (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+  queryPromise
+    .then((data) => res.json(data))
+    .catch((err) => res.status(500).json(err));
+});
+
+// GET DATA VEHICLE BY ID
+app.get("/vehicles/:id", (req, res) => {
+  const { params } = req;
+
+  const queryString =
+    'SELECT v.id, v.vehicle_name, v.rating, v.price, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?';
+
+  const queryPromise = new Promise((resolve, reject) => {
+    db.query(queryString, params.id, (err, results) => {
       if (err) return reject(err);
       return resolve(results);
     });
@@ -55,39 +77,8 @@ app.post("/vehicles", (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// GET DATA VEHICLE BY HIGH RATING
-app.get("/vehicles/rating", (req, res) => {
-  const queryString = "SELECT * FROM vehicles ORDER BY rating DESC";
-  const queryPromise = new Promise((resolve, reject) => {
-    db.query(queryString, (err, results) => {
-      if (err) return reject(err);
-      return resolve(results);
-    });
-  });
-  queryPromise
-    .then((data) => res.json(data))
-    .catch((err) => res.status(500).json(err));
-});
-
-// GET DATA VEHICLE BY ID
-app.get("/vehicle/:id", (req, res) => {
-  const { params } = req;
-
-  const queryString =
-    'SELECT v.id, v.vehicle_name, v.rating, v.price, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?;';
-  const queryPromise = new Promise((resolve, reject) => {
-    db.query(queryString, params.id, (err, results) => {
-      if (err) return reject(err);
-      return resolve(results);
-    });
-  });
-  queryPromise
-    .then((data) => res.json(data))
-    .catch((err) => res.status(500).json(err));
-});
-
 // UPDATE VEHICLE
-app.patch("/vehicle/:id", (req, res) => {
+app.patch("/vehicles/:id", (req, res) => {
   const { body, params } = req;
 
   const queryString = "UPDATE vehicles SET ? WHERE id = ?";
@@ -103,7 +94,7 @@ app.patch("/vehicle/:id", (req, res) => {
 });
 
 // DELETE DATA VEHICLE
-app.delete("/vehicle/:id", (req, res) => {
+app.delete("/vehicles/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "DELETE FROM vehicles WHERE id = ?";
@@ -118,11 +109,15 @@ app.delete("/vehicle/:id", (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// GET USERS
+// GET USERS AND FIND
 app.get("/users", (req, res) => {
-  const queryString = "SELECT * FROM users";
+  const { query } = req;
+  const queryString = "SELECT * FROM users WHERE name LIKE '%?%'";
+  let inputValue = "";
+  if (query?.vehicle_name) inputValue = query.vehicle_name;
+
   const queryPromise = new Promise((resolve, reject) => {
-    db.query(queryString, (err, results) => {
+    db.query(queryString, mysql.raw(`${inputValue}`), (err, results) => {
       if (err) return reject(err);
       return resolve(results);
     });
@@ -133,7 +128,7 @@ app.get("/users", (req, res) => {
 });
 
 // GET DATA BY USER ID
-app.get("/user/:id", (req, res) => {
+app.get("/users/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "SELECT * FROM users WHERE id = ?";
@@ -164,7 +159,7 @@ app.post("/users", (req, res) => {
 });
 
 // UPDATE USER BY ID
-app.patch("/user/:id", (req, res) => {
+app.patch("/users/:id", (req, res) => {
   const { body, params } = req;
 
   const queryString = "UPDATE users SET ? WHERE id = ?";
@@ -180,7 +175,7 @@ app.patch("/user/:id", (req, res) => {
 });
 
 // DELETE DATA USER BY ID
-app.delete("/user/:id", (req, res) => {
+app.delete("/users/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "DELETE FROM users WHERE id = ?";
@@ -197,10 +192,13 @@ app.delete("/user/:id", (req, res) => {
 
 // GET DATA CATEGORIES
 app.get("/categories", (req, res) => {
-  const queryString = "SELECT * FROM categories";
+  const { query } = req;
+  const queryString = "SELECT * FROM categories WHERE name LIKE '%?%'";
+  let inputValue = "";
+  if (query?.vehicle_name) inputValue = query.vehicle_name;
 
   const queryPromise = new Promise((resolve, reject) => {
-    db.query(queryString, (err, results) => {
+    db.query(queryString, mysql.raw(`${inputValue}`), (err, results) => {
       if (err) return reject(err);
       return resolve(results);
     });
@@ -211,7 +209,7 @@ app.get("/categories", (req, res) => {
 });
 
 // GET CATEGORY BY ID
-app.get("/category/:id", (req, res) => {
+app.get("/categories/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "SELECT * FROM categories WHERE id = ?";
@@ -243,7 +241,7 @@ app.post("/categories", (req, res) => {
 });
 
 // UPDATE CATEGORY BY ID
-app.patch("/category/:id", (req, res) => {
+app.patch("/categories/:id", (req, res) => {
   const { body, params } = req;
 
   const queryString = "UPDATE categories SET ? WHERE id = ?";
@@ -259,7 +257,7 @@ app.patch("/category/:id", (req, res) => {
 });
 
 // DELETE CATEGORY BY ID
-app.delete("/category/:id", (req, res) => {
+app.delete("/categories/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "DELETE FROM categories WHERE id = ?";
@@ -277,7 +275,7 @@ app.delete("/category/:id", (req, res) => {
 // GET DATA TRANSACTIONS / HISTORY
 app.get("/transactions", (req, res) => {
   const queryString =
-    "SELECT u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id";
+    "SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id ORDER BY t.date ASC";
 
   const queryPromise = new Promise((resolve, reject) => {
     db.query(queryString, (err, results) => {
@@ -291,11 +289,11 @@ app.get("/transactions", (req, res) => {
 });
 
 // GET TRANSACTION BY ID
-app.get("/transaction/:id", (req, res) => {
+app.get("/transactions/:id", (req, res) => {
   const { params } = req;
 
   const queryString =
-    "SELECT u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE t.id = ?";
+    "SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE t.id = ?";
   const queryPromise = new Promise((resolve, reject) => {
     db.query(queryString, params.id, (err, results) => {
       if (err) return reject(err);
@@ -324,7 +322,7 @@ app.post("/transactions", (req, res) => {
 });
 
 // UPDATE TRANSACTION
-app.patch("/transaction/:id", (req, res) => {
+app.patch("/transactions/:id", (req, res) => {
   const { body, params } = req;
 
   const queryString = "UPDATE transactions SET ? WHERE id = ?";
@@ -339,7 +337,8 @@ app.patch("/transaction/:id", (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-app.delete("/transaction/:id", (req, res) => {
+// DELETE TRANSACTION
+app.delete("/transactions/:id", (req, res) => {
   const { params } = req;
 
   const queryString = "DELETE FROM transactions WHERE id = ?";
