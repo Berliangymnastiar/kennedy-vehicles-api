@@ -2,10 +2,7 @@ const transactionRouter = require("express").Router();
 
 const transactionController = require("../controllers/transactions");
 
-// GET DATA TRANSACTIONS / HISTORY BY DATE
 transactionRouter.get("/", transactionController.getAllTransactions);
-// GET TRANSACTION BY ID
-transactionRouter.get("/:id", transactionController.getTransactionById);
 // CREATE TRANSACTIONS
 transactionRouter.post("/", transactionController.createTransaction);
 // UPDATE TRANSACTION

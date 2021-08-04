@@ -12,17 +12,6 @@ const getAllTransactions = (inputValue) => {
   });
 };
 
-const getTransactionById = (id) => {
-  return new Promise((resolve, reject) => {
-    const queryString =
-      "SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE t.id = ? ORDER BY t.date ASC";
-    db.query(queryString, id, (err, results) => {
-      if (err) return reject(err);
-      return resolve(results);
-    });
-  });
-};
-
 const createTransaction = (body) => {
   return new Promise((resolve, reject) => {
     const queryString = "INSERT INTO transactions SET ?";
@@ -55,7 +44,6 @@ const deleteTransaction = (id) => {
 
 module.exports = {
   getAllTransactions,
-  getTransactionById,
   createTransaction,
   updateTransaction,
   deleteTransaction,

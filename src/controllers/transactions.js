@@ -11,15 +11,6 @@ const getAllTransactions = (req, res) => {
     .catch((err) => responseHelper.error(res, 500, err));
 };
 
-const getTransactionById = (req, res) => {
-  const { params } = req;
-
-  transactionModel
-    .getTransactionById(params.id)
-    .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
-};
-
 const createTransaction = (req, res) => {
   const { body } = req;
 
@@ -49,7 +40,6 @@ const deleteTransaction = (req, res) => {
 
 module.exports = {
   getAllTransactions,
-  getTransactionById,
   createTransaction,
   updateTransaction,
   deleteTransaction,
