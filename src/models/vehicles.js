@@ -26,7 +26,7 @@ const getVehicleById = (id) => {
 
 const getPopularVehicle = () => {
   return new Promise((resolve, reject) => {
-    const queryString = "SELECT * FROM vehicles WHERE rating > 8";
+    const queryString = "SELECT * FROM vehicles WHERE rating > 7";
 
     db.query(queryString, (err, results) => {
       if (err) return reject(err);
