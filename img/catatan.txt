@@ -1,0 +1,6 @@
+API atau Application Programming Interface  adalah sebuah interface 
+yang dapat menghubungkan aplikasi satu dengan aplikasi lainnya. Dan 
+API berperan menjadi perantara antar aplikasi yang berbeda
+
+MySQL adalah sebuah database management system(DBMS) menggunakan perintah
+SQL(Structured Query Language)

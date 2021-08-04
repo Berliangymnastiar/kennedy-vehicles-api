@@ -26,7 +26,8 @@ const getVehicleById = (id) => {
 
 const getPopularVehicle = () => {
   return new Promise((resolve, reject) => {
-    const queryString = "SELECT * FROM vehicles WHERE rating > 7";
+    const queryString =
+      "SELECT v.id, v.vehicle_name, v.rating, v.price, v.location, v.picture, c.name AS 'category_name' FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.rating >= 7";
 
     db.query(queryString, (err, results) => {
       if (err) return reject(err);
