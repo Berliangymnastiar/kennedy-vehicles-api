@@ -1,11 +1,32 @@
 const db = require("../database/mysql");
 
-const getAllUsers = (inputValue) => {
+const getAllUsers = (query) => {
   return new Promise((resolve, reject) => {
-    let queryString = "SELECT * FROM users WHERE name LIKE ?";
-    db.query(queryString, inputValue, (err, results) => {
+    let queryString =
+      `SELECT * FROM users WHERE name LIKE ?` +
+      (query?.filter ? ` AND gender = '${query.filter}' ` : " ") +
+      (query?.order_by && query?.sort
+        ? ` ORDER BY ${query.order_by} ${query.sort} `
+        : " ") +
+      `LIMIT ? OFFSET ?`;
+
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 3;
+    const offset = limit * (page - 1);
+    const countQs = 'SELECT count(*) AS "total_data" FROM users';
+
+    let inputValue = `%${query.name || ""}%`;
+    db.query(queryString, [inputValue, limit, offset], (err, resultGet) => {
       if (err) return reject(err);
-      return resolve(results);
+      db.query(countQs, (err, resultCount) => {
+        if (err) return reject(err);
+        return resolve({
+          data: resultGet,
+          count: resultCount,
+          limit,
+          page,
+        });
+      });
     });
   });
 };

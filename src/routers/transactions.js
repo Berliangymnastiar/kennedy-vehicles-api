@@ -3,6 +3,7 @@ const transactionRouter = require("express").Router();
 const transactionController = require("../controllers/transactions");
 
 transactionRouter.get("/", transactionController.getAllTransactions);
+// transactionRouter.get("/popular", transactionController.getPopularTransactions);
 // CREATE TRANSACTIONS
 transactionRouter.post("/", transactionController.createTransaction);
 // UPDATE TRANSACTION

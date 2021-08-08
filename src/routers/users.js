@@ -1,4 +1,5 @@
 const userRouter = require("express").Router();
+const upload = require("../middlewares/upload");
 
 const userController = require("../controllers/users");
 
@@ -9,7 +10,7 @@ userRouter.get("/:id", userController.getUserById);
 // CREATE DATA USERS
 userRouter.post("/", userController.createUser);
 // UPDATE USER BY ID
-userRouter.patch("/:id", userController.updateUser);
+userRouter.patch("/:id", upload.single("picture"), userController.updateUser);
 // DELETE DATA USER BY ID
 userRouter.delete("/:id", userController.deleteUser);
 

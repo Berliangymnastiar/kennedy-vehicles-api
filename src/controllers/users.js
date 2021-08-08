@@ -4,10 +4,30 @@ const responseHelper = require("../helpers/response");
 const getAllUsers = (req, res) => {
   const { query } = req;
 
-  let inputValue = `%${query.name || ""}%`;
   userModel
-    .getAllUsers(inputValue)
-    .then((data) => responseHelper.success(res, 200, data))
+    .getAllUsers(query)
+    .then(({ data, count, limit, page }) => {
+      const baseURL = "http://localhost:8000/users";
+      const totalData = count[0].total_data;
+      const totalPage = Math.ceil(totalData / Number(limit));
+      const currentPage = Number(page);
+      const prevPage =
+        currentPage > 1
+          ? baseURL + `?page=${currentPage - 1}&limit=${limit}`
+          : null;
+      const nextPage =
+        currentPage < totalPage
+          ? baseURL + `?page=${currentPage + 1}&limit=${limit}`
+          : null;
+      const info = {
+        totalData,
+        currentPage,
+        totalPage,
+        nextPage,
+        prevPage,
+      };
+      responseHelper.success(res, 200, data, info);
+    })
     .catch((err) => responseHelper.error(res, 500, err));
 };
 
@@ -30,7 +50,13 @@ const createUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  const { body, params } = req;
+  const { file, params } = req;
+
+  const host = "http://localhost:8000";
+  const imageURL = `/images/${file.filename}`;
+  const body = {
+    picture: host + imageURL,
+  };
 
   userModel
     .updateUser(body, params.id)

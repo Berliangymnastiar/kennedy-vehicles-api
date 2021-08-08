@@ -1,13 +1,32 @@
 const db = require("../database/mysql");
 
-const getAllTransactions = (inputValue) => {
+const getAllTransactions = (query) => {
   return new Promise((resolve, reject) => {
     let queryString =
-      "SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE v.vehicle_name LIKE ? ORDER BY t.date ASC";
+      `SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.rating, v.category_id, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE vehicle_name LIKE ?` +
+      (query?.filter ? ` AND u.name LIKE '%${query.filter}%' ` : " ") +
+      (query?.order_by && query?.sort
+        ? ` ORDER BY ${query.order_by} ${query.sort} `
+        : " ") +
+      `LIMIT ? OFFSET ?`;
 
-    db.query(queryString, inputValue, (err, results) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 3;
+    const offset = limit * (page - 1);
+    const countQs = 'SELECT count(*) AS "total_data" FROM transactions';
+
+    let inputValue = `%${query.vehicle_name || ""}%`;
+    db.query(queryString, [inputValue, limit, offset], (err, resultGet) => {
       if (err) return err;
-      return resolve(results);
+      db.query(countQs, (err, resultCount) => {
+        if (err) return reject(err);
+        return resolve({
+          data: resultGet,
+          count: resultCount,
+          limit,
+          page,
+        });
+      });
     });
   });
 };

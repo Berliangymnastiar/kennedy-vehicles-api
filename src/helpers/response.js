@@ -1,7 +1,7 @@
-const success = (res, status, data) => {
+const success = (res, status, result, info) => {
   const objectResponse = {
-    errMessage: null,
-    data,
+    result,
+    info,
   };
   res.status(status).json(objectResponse);
 };
