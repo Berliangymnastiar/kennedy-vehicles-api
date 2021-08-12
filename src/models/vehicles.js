@@ -3,8 +3,8 @@ const db = require("../database/mysql");
 const getAllVehicles = (query) => {
   return new Promise((resolve, reject) => {
     let queryString =
-      `SELECT v.id, v.vehicle_name, v.price, v.location, v.picture, c.name AS 'category_name' FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE vehicle_name LIKE ?` +
-      (query?.filter ? ` AND c.name = '${query.filter}' ` : " ") +
+      `SELECT v.id, v.name, v.price, v.location, v.picture, c.name AS 'category_name' FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.name LIKE ?` +
+      (query?.filter ? ` AND c.name LIKE '%${query.filter}%' ` : " ") +
       (query?.order_by && query?.sort
         ? ` ORDER BY ${query.order_by} ${query.sort} `
         : " ") +
@@ -15,9 +15,10 @@ const getAllVehicles = (query) => {
     const offset = limit * (page - 1);
     const countQs = 'SELECT count(*) AS "total_data" FROM vehicles';
 
-    let inputValue = `%${query.vehicle_name || ""}%`;
+    let inputValue = `%${query.name || ""}%`;
     db.query(queryString, [inputValue, limit, offset], (err, resultGet) => {
       if (err) return reject(err);
+      if (!resultGet.length) return reject(404);
       db.query(countQs, (err, resultCount) => {
         if (err) return reject(err);
         return resolve({
@@ -34,7 +35,7 @@ const getAllVehicles = (query) => {
 const getVehicleById = (id) => {
   return new Promise((resolve, reject) => {
     const queryString =
-      'SELECT v.id, v.vehicle_name, v.price, v.location, v.picture, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?';
+      'SELECT v.id, v.name, v.price, v.location, v.picture, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?';
 
     db.query(queryString, id, (err, results) => {
       if (err) return reject(err);
@@ -46,7 +47,7 @@ const getVehicleById = (id) => {
 const getPopularVehicle = () => {
   return new Promise((resolve, reject) => {
     const queryString =
-      "SELECT t.id, v.vehicle_name, v.price, t.rating, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id WHERE t.rating > 7 ORDER BY t.date ASC";
+      "SELECT t.id, v.name, v.price, t.rating, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id WHERE t.rating > 7 ORDER BY t.date ASC";
 
     db.query(queryString, (err, results) => {
       if (err) return reject(err);

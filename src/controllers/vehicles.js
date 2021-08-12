@@ -28,14 +28,22 @@ const getAllVehicles = (req, res) => {
       };
       responseHelper.success(res, 200, data, info);
     })
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while get data vehicles",
+      });
+    });
 };
 
 const getPopularVehicle = (req, res) => {
   vehicleModel
     .getPopularVehicle()
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while get popular vehicle",
+      });
+    });
 };
 
 const getVehicleById = (req, res) => {
@@ -44,7 +52,11 @@ const getVehicleById = (req, res) => {
   vehicleModel
     .getVehicleById(params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while get the vehicle",
+      });
+    });
 };
 
 const createVehicle = (req, res) => {
@@ -53,21 +65,33 @@ const createVehicle = (req, res) => {
   vehicleModel
     .createVehicle(body)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while creating vehicle",
+      });
+    });
 };
 
 const updateVehicle = (req, res) => {
-  const { file, params } = req;
+  const { body, file, params } = req;
 
-  const host = "http://localhost:8000";
-  const imageURL = `/images/${file.filename}`;
-  const body = {
-    picture: host + imageURL,
-  };
+  let input = { ...body };
+  if (file) {
+    const host = "http://localhost:8000";
+    const imageURL = `/images/${file.filename}`;
+    input = {
+      picture: host + imageURL,
+      ...input,
+    };
+  }
   vehicleModel
-    .updateVehicle(body, params)
-    .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .updateVehicle(input, params)
+    .then((data) => responseHelper.success(res, 201, data))
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while update data vehicles",
+      });
+    });
 };
 
 const deleteVehicle = (req, res) => {
@@ -76,7 +100,11 @@ const deleteVehicle = (req, res) => {
   vehicleModel
     .deleteVehicle(params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while delete data",
+      });
+    });
 };
 
 // const editVehicle = (req, res) => {

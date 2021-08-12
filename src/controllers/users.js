@@ -28,7 +28,11 @@ const getAllUsers = (req, res) => {
       };
       responseHelper.success(res, 200, data, info);
     })
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while get data users",
+      });
+    });
 };
 
 const getUserById = (req, res) => {
@@ -37,7 +41,11 @@ const getUserById = (req, res) => {
   userModel
     .getUserById(params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while get data user by id",
+      });
+    });
 };
 
 const createUser = (req, res) => {
@@ -46,7 +54,11 @@ const createUser = (req, res) => {
   userModel
     .createUser(body)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while creating the user",
+      });
+    });
 };
 
 const updateUser = (req, res) => {
@@ -61,7 +73,11 @@ const updateUser = (req, res) => {
   userModel
     .updateUser(body, params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while update data",
+      });
+    });
 };
 
 const updatePassword = (req, res) => {
@@ -69,7 +85,11 @@ const updatePassword = (req, res) => {
   userModel
     .updatePassword(body, params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while update password",
+      });
+    });
 };
 
 const deleteUser = (req, res) => {
@@ -78,7 +98,11 @@ const deleteUser = (req, res) => {
   userModel
     .deleteUser(params.id)
     .then((data) => responseHelper.success(res, 200, data))
-    .catch((err) => responseHelper.error(res, 500, err));
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "some error occured while delete user",
+      });
+    });
 };
 
 module.exports = {

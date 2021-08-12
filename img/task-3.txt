@@ -1,0 +1,8 @@
+1. otentikasi adalah proses untuk memasuki sistem, nama dan password
+dari user melalui pengecekan apakah user dan password tersebut ada didalam sistemj
+2. otorisasi adalah memverifikasi bahwa user memiliki akses tertentu
+3. cors adalah mekanisme yang memanfaatkan HTTP untuk bertujuan mengizinkan
+sebuah web yang berjalan didomain tertentu
+4. multer adalah sebuah package untuk mengupload gambar atau file
+5. jwt adalah suatu token random yang diberikan kepada user untuk melakukan
+proses login kedalam sistem

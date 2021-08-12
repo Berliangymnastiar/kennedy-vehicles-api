@@ -3,7 +3,7 @@ const db = require("../database/mysql");
 const getAllTransactions = (query) => {
   return new Promise((resolve, reject) => {
     let queryString =
-      `SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.vehicle_name, v.price, t.rating, v.category_id, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE vehicle_name LIKE ?` +
+      `SELECT t.id, u.name, u.email, u.phonenumber, u.address, u.gender, v.name, v.price, t.rating, v.category_id, t.date FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id JOIN users u ON t.user_id = u.id WHERE vehicle_name LIKE ?` +
       (query?.filter ? ` AND u.name LIKE '%${query.filter}%' ` : " ") +
       (query?.order_by && query?.sort
         ? ` ORDER BY ${query.order_by} ${query.sort} `
