@@ -64,6 +64,14 @@ const updateUser = (req, res) => {
     .catch((err) => responseHelper.error(res, 500, err));
 };
 
+const updatePassword = (req, res) => {
+  const { body, params } = req;
+  userModel
+    .updatePassword(body, params.id)
+    .then((data) => responseHelper.success(res, 200, data))
+    .catch((err) => responseHelper.error(res, 500, err));
+};
+
 const deleteUser = (req, res) => {
   const { params } = req;
 
@@ -78,5 +86,6 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
+  updatePassword,
   deleteUser,
 };

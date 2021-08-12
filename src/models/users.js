@@ -1,4 +1,5 @@
 const db = require("../database/mysql");
+const bcrypt = require("bcrypt");
 
 const getAllUsers = (query) => {
   return new Promise((resolve, reject) => {
@@ -44,9 +45,46 @@ const getUserById = (id) => {
 const createUser = (body) => {
   return new Promise((resolve, reject) => {
     const queryString = "INSERT INTO users SET ?";
-    db.query(queryString, body, (err, results) => {
+    bcrypt.genSalt(10, (err, salt) => {
       if (err) return reject(err);
-      return resolve(results);
+      bcrypt.hash(body.password, salt, (error, hash) => {
+        if (error) return reject(error);
+        const userData = {
+          ...body,
+          password: hash,
+        };
+        db.query(queryString, userData, (err, results) => {
+          if (err) return reject(err);
+          return resolve(results);
+        });
+      });
+    });
+  });
+};
+
+const updatePassword = (body, id) => {
+  return new Promise((resolve, reject) => {
+    const { oldPassword, newPassword } = body;
+    const getPasswordQs = "SELECT password FROM users where id = ?";
+    const updateQs = "UPDATE users SET ? WHERE id = ?";
+    db.query(getPasswordQs, id, (err, result) => {
+      if (err) return reject(err);
+      bcrypt.compare(
+        oldPassword,
+        result[0].password,
+        (err, isPasswordValid) => {
+          if (err) return reject(err);
+          if (!isPasswordValid) return reject("Wrong Password!");
+          bcrypt.hash(newPassword, 10, (err, hash) => {
+            if (err) return reject(err);
+            const newPassword = { password: hash };
+            db.query(updateQs, [newPassword, id], (err, result) => {
+              if (err) return reject(err);
+              return resolve(result);
+            });
+          });
+        }
+      );
     });
   });
 };
@@ -75,6 +113,7 @@ module.exports = {
   getAllUsers,
   getUserById,
   createUser,
+  updatePassword,
   updateUser,
   deleteUser,
 };

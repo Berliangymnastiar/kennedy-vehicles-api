@@ -1,6 +1,7 @@
 // sub-router menuju tabel vehicles
 const vehicleRouter = require("express").Router();
 const upload = require("../middlewares/upload");
+const authMiddlewares = require("../middlewares/auth");
 
 const vehicleController = require("../controllers/vehicles");
 
@@ -23,16 +24,37 @@ const vehicleController = require("../controllers/vehicles");
 
 // let upload = multer({ storage: storage });
 
-vehicleRouter.get("/", vehicleController.getAllVehicles);
-vehicleRouter.get("/popular", vehicleController.getPopularVehicle);
-vehicleRouter.get("/:id", vehicleController.getVehicleById);
-vehicleRouter.post("/", vehicleController.createVehicle);
+vehicleRouter.get(
+  "/",
+  authMiddlewares.checkToken,
+  vehicleController.getAllVehicles
+);
+vehicleRouter.get(
+  "/popular",
+  authMiddlewares.checkToken,
+  vehicleController.getPopularVehicle
+);
+vehicleRouter.get(
+  "/:id",
+  authMiddlewares.checkToken,
+  vehicleController.getVehicleById
+);
+vehicleRouter.post(
+  "/",
+  authMiddlewares.checkToken,
+  vehicleController.createVehicle
+);
 vehicleRouter.patch(
   "/:id",
+  authMiddlewares.checkToken,
   upload.single("picture"),
   vehicleController.updateVehicle
 );
-vehicleRouter.delete("/:id", vehicleController.deleteVehicle);
+vehicleRouter.delete(
+  "/:id",
+  authMiddlewares.checkToken,
+  vehicleController.deleteVehicle
+);
 
 module.exports = vehicleRouter;
 // vehicleRouter.post("/image", upload.single("img"), (req, res) => {

@@ -34,7 +34,7 @@ const getAllVehicles = (query) => {
 const getVehicleById = (id) => {
   return new Promise((resolve, reject) => {
     const queryString =
-      'SELECT v.id, v.vehicle_name, v.rating, v.price, v.location, v.picture, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?';
+      'SELECT v.id, v.vehicle_name, v.price, v.location, v.picture, c.name AS "category_name" FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?';
 
     db.query(queryString, id, (err, results) => {
       if (err) return reject(err);

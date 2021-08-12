@@ -8,11 +8,13 @@ const vehicleRouter = require("./vehicles");
 const userRouter = require("./users");
 const categoryRouter = require("./categories");
 const transactionRouter = require("./transactions");
+const authRouter = require("./auth");
 
 mainRouter.use("/", pingRouter);
 mainRouter.use("/vehicles", vehicleRouter);
 mainRouter.use("/users", userRouter);
 mainRouter.use("/categories", categoryRouter);
 mainRouter.use("/transactions", transactionRouter);
+mainRouter.use("/auth", authRouter);
 
 module.exports = mainRouter;

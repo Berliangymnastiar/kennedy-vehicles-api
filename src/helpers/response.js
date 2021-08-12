@@ -6,9 +6,9 @@ const success = (res, status, result, info) => {
   res.status(status).json(objectResponse);
 };
 
-const error = (res, status, errMessage) => {
+const error = (res, status, message) => {
   const objectResponse = {
-    errMessage,
+    message,
     data: null,
   };
   res.status(status).json(objectResponse);
