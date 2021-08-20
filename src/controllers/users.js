@@ -62,20 +62,23 @@ const createUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  const { file, params } = req;
+  const { body, file, params } = req;
 
-  const host = "http://localhost:8000";
-  const imageURL = `/images/${file.filename}`;
-  const body = {
-    picture: host + imageURL,
-  };
-
+  let input = { ...body };
+  if (file) {
+    const host = "http://localhost:8000";
+    const imageURL = `/images/${file.filename}`;
+    input = {
+      picture: host + imageURL,
+      ...input,
+    };
+  }
   userModel
-    .updateUser(body, params.id)
+    .updateUser(input, params)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "some error occured while update data",
+        message: err.message || "some error occured while update data vehicles",
       });
     });
 };

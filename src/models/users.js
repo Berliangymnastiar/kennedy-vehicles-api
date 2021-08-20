@@ -44,18 +44,24 @@ const getUserById = (id) => {
 
 const createUser = (body) => {
   return new Promise((resolve, reject) => {
-    const queryString = "INSERT INTO users SET ?";
-    bcrypt.genSalt(10, (err, salt) => {
+    const getQuerySelect = "SELECT email FROM users WHERE email = ?";
+    db.query(getQuerySelect, body.email, (err, result) => {
       if (err) return reject(err);
-      bcrypt.hash(body.password, salt, (error, hash) => {
-        if (error) return reject(error);
-        const userData = {
-          ...body,
-          password: hash,
-        };
-        db.query(queryString, userData, (err, results) => {
-          if (err) return reject(err);
-          return resolve(results);
+      if (result[0]?.email !== undefined)
+        return reject(new Error("email already taken!"));
+      const queryString = "INSERT INTO users SET ?";
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) return reject(err);
+        bcrypt.hash(body.password, salt, (error, hash) => {
+          if (error) return reject(error);
+          const userData = {
+            ...body,
+            password: hash,
+          };
+          db.query(queryString, userData, (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+          });
         });
       });
     });
@@ -89,10 +95,10 @@ const updatePassword = (body, id) => {
   });
 };
 
-const updateUser = (body, id) => {
+const updateUser = (body, params) => {
   return new Promise((resolve, reject) => {
     const queryString = "UPDATE users SET ? WHERE id = ?";
-    db.query(queryString, [body, id], (err, results) => {
+    db.query(queryString, [body, params.id], (err, results) => {
       if (err) return reject(err);
       return resolve(results);
     });

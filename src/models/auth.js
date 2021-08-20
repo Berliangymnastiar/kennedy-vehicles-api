@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const login = ({ email, password }) => {
   return new Promise((resolve, reject) => {
-    const getPassQs = "SELECT name, password FROM users WHERE email = ?";
+    const getPassQs = "SELECT name, password, roles FROM users WHERE email = ?";
     db.query(getPassQs, email, (err, result) => {
       if (err) return reject(err);
       if (!result.length) return reject("Email not found!");
@@ -15,6 +15,7 @@ const login = ({ email, password }) => {
         const payload = {
           name: result[0].name,
           email,
+          roles: result[0].roles,
         };
         jwt.sign(
           payload,

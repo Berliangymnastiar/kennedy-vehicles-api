@@ -86,7 +86,7 @@ const updateVehicle = (req, res) => {
   }
   vehicleModel
     .updateVehicle(input, params)
-    .then((data) => responseHelper.success(res, 201, data))
+    .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
       res.status(500).send({
         message: err.message || "some error occured while update data vehicles",

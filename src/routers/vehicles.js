@@ -27,6 +27,7 @@ const vehicleController = require("../controllers/vehicles");
 vehicleRouter.get(
   "/",
   authMiddlewares.checkToken,
+  authMiddlewares.isUser,
   vehicleController.getAllVehicles
 );
 vehicleRouter.get(

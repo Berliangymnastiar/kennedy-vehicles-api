@@ -70,7 +70,6 @@ const createVehicle = (body) => {
 const updateVehicle = (body, params) => {
   return new Promise((resolve, reject) => {
     const queryString = "UPDATE vehicles SET ? WHERE id = ?";
-
     db.query(queryString, [body, params.id], (err, results) => {
       if (err) return reject(err);
       return resolve(results);
