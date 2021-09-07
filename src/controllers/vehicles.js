@@ -29,8 +29,8 @@ const getAllVehicles = (req, res) => {
       responseHelper.success(res, 200, data, info);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while get data vehicles",
+      res.status(404).send({
+        message: err.message || "data not found",
       });
     });
 };
@@ -60,10 +60,20 @@ const getVehicleById = (req, res) => {
 };
 
 const createVehicle = (req, res) => {
-  const { body } = req;
+  const { body, file } = req;
+
+  let input = { ...body };
+  if (file) {
+    const host = "http://localhost:8000";
+    const imageURL = `/images/${file.filename}`;
+    input = {
+      picture: host + imageURL,
+      ...input,
+    };
+  }
 
   vehicleModel
-    .createVehicle(body)
+    .createVehicle(input)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
       res.status(500).send({

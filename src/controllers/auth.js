@@ -16,7 +16,9 @@ const login = (req, res) => {
 
   authModel
     .login(body)
-    .then((result) => responseHelper.success(res, 200, { token: result }))
+    .then(({ token, userInfo }) =>
+      responseHelper.success(res, 200, { token: token, userInfo: userInfo })
+    )
     .catch((err) => responseHelper.error(res, 500, err));
 };
 const logout = (req, res) => {};

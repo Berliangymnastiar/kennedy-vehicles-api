@@ -2,6 +2,7 @@ const success = (res, status, result, info) => {
   const objectResponse = {
     result,
     info,
+    status: true,
   };
   res.status(status).json(objectResponse);
 };
@@ -9,7 +10,7 @@ const success = (res, status, result, info) => {
 const error = (res, status, message) => {
   const objectResponse = {
     message,
-    data: null,
+    status: false,
   };
   res.status(status).json(objectResponse);
 };

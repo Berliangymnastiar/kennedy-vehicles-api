@@ -43,6 +43,7 @@ vehicleRouter.get(
 vehicleRouter.post(
   "/",
   authMiddlewares.checkToken,
+  upload.single("picture"),
   vehicleController.createVehicle
 );
 vehicleRouter.patch(

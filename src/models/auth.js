@@ -7,11 +7,12 @@ const login = ({ email, password }) => {
     const getPassQs = "SELECT name, password, roles FROM users WHERE email = ?";
     db.query(getPassQs, email, (err, result) => {
       if (err) return reject(err);
-      if (!result.length) return reject("Email not found!");
+      if (!email) return reject("Please input email");
+      if (!result.length) return reject("Email not found");
       bcrypt.compare(password, result[0].password, (err, isPasswordValid) => {
         if (err) return reject(err);
-        if (!isPasswordValid)
-          return reject("Login failed or check your password!");
+        if (!password) return reject("Please input password");
+        if (!isPasswordValid) return reject("Login failed wrong password!");
         const payload = {
           name: result[0].name,
           email,
@@ -21,16 +22,30 @@ const login = ({ email, password }) => {
           payload,
           process.env.SECRET_KEY,
           {
-            expiresIn: "5m",
+            expiresIn: "5h",
             issuer: "kennedy-vehicle",
           },
           (err, token) => {
             if (err) return reject(err);
-            return resolve(token);
+            const queryGetUser = `SELECT name, email, picture, roles FROM users WHERE email = "${email}"`;
+            db.query(queryGetUser, (err, resultUser) => {
+              if (err) return reject(err);
+              return resolve({
+                token: token,
+                userInfo: resultUser,
+              });
+              // console.log(userInfo);
+            });
+            // return resolve(token);
           }
         );
       });
     });
+    // const queryGetUser = `SELECT name, email, picture, roles FROM users WHERE email = "${email}"`;
+    // db.query(queryGetUser, (err, result) => {
+    //   if (err) return reject(err);
+    //   return resolve(result);
+    // });
   });
 };
 
