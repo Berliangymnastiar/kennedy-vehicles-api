@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 
 const login = ({ email, password }) => {
   return new Promise((resolve, reject) => {
-    const getPassQs = "SELECT name, password, roles FROM users WHERE email = ?";
+    const getPassQs =
+      "SELECT name, password, roles, gender FROM users WHERE email = ?";
     db.query(getPassQs, email, (err, result) => {
       if (err) return reject(err);
       if (!email) return reject("Please input email");
@@ -12,7 +13,8 @@ const login = ({ email, password }) => {
       bcrypt.compare(password, result[0].password, (err, isPasswordValid) => {
         if (err) return reject(err);
         if (!password) return reject("Please input password");
-        if (!isPasswordValid) return reject("Login failed wrong password!");
+        if (!isPasswordValid)
+          return reject("Login failed wrong email or password!");
         const payload = {
           name: result[0].name,
           email,
@@ -27,7 +29,7 @@ const login = ({ email, password }) => {
           },
           (err, token) => {
             if (err) return reject(err);
-            const queryGetUser = `SELECT name, email, picture, roles FROM users WHERE email = "${email}"`;
+            const queryGetUser = `SELECT id, name, email, picture, roles, gender, address FROM users WHERE email = "${email}"`;
             db.query(queryGetUser, (err, resultUser) => {
               if (err) return reject(err);
               return resolve({

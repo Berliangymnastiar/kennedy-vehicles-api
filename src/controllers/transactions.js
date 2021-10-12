@@ -32,6 +32,23 @@ const getAllTransactions = (req, res) => {
     .catch((err) => responseHelper.error(res, 500, err));
 };
 
+const getTransactionByUser = (req, res) => {
+  const { params } = req;
+
+  transactionModel
+    .getTransactionByUser(params.id)
+    .then((data) => responseHelper.success(res, 200, data))
+    .catch((err) => responseHelper.error(res, 500, err));
+};
+
+const getTransactionById = (req, res) => {
+  const { params } = req;
+
+  transactionModel
+    .getTransactionById(params.transactionId)
+    .then((data) => responseHelper.success(res, 200, data))
+    .catch((err) => responseHelper.error(res, 500, err));
+};
 // const getPopularTransactions = (req, res) => {
 //   transactionModel
 //     .getPopularTransactions()
@@ -68,6 +85,8 @@ const deleteTransaction = (req, res) => {
 
 module.exports = {
   getAllTransactions,
+  getTransactionByUser,
+  getTransactionById,
   // getPopularTransactions,
   createTransaction,
   updateTransaction,

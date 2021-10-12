@@ -26,35 +26,35 @@ const vehicleController = require("../controllers/vehicles");
 
 vehicleRouter.get(
   "/",
-  authMiddlewares.checkToken,
-  authMiddlewares.isUser,
+  // authMiddlewares.checkToken,
+  // authMiddlewares.isUser,
   vehicleController.getAllVehicles
 );
 vehicleRouter.get(
   "/popular",
-  authMiddlewares.checkToken,
+  // authMiddlewares.checkToken,
   vehicleController.getPopularVehicle
 );
 vehicleRouter.get(
   "/:id",
-  authMiddlewares.checkToken,
+  // authMiddlewares.checkToken,
   vehicleController.getVehicleById
 );
 vehicleRouter.post(
   "/",
-  authMiddlewares.checkToken,
+  // authMiddlewares.checkToken,
   upload.single("picture"),
   vehicleController.createVehicle
 );
 vehicleRouter.patch(
   "/:id",
-  authMiddlewares.checkToken,
+  // authMiddlewares.checkToken,
   upload.single("picture"),
   vehicleController.updateVehicle
 );
 vehicleRouter.delete(
   "/:id",
-  authMiddlewares.checkToken,
+  // authMiddlewares.checkToken,
   vehicleController.deleteVehicle
 );
 

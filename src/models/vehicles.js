@@ -2,10 +2,13 @@ const db = require("../database/mysql");
 
 const getAllVehicles = (query) => {
   return new Promise((resolve, reject) => {
+    let location = query?.location ? query?.location : "";
+    let filter = query?.filter ? query?.filter : "";
     let queryString =
-      `SELECT v.id, v.name, v.price, v.location, v.capacity, v.picture, s.name AS 'status_name', v.available_item, c.name AS 'category_name' 
-      FROM vehicles v JOIN categories c ON v.category_id = c.id JOIN status s ON v.status_id = s.id WHERE v.name LIKE ?` +
-      (query?.filter ? ` AND c.name LIKE '%${query.filter}%' ` : " ") +
+      `SELECT v.id, v.name, v.price, v.location, v.capacity, v.picture, v.available_item, v.description, c.name AS 'category_name' 
+      FROM vehicles v JOIN categories c ON v.category_id = c.id  WHERE v.name LIKE ?` +
+      ` AND c.name LIKE '%${filter}%' ` +
+      ` AND v.location LIKE '%${location}%' ` +
       (query?.order_by && query?.sort
         ? ` ORDER BY ${query.order_by} ${query.sort} `
         : " ") +
@@ -35,8 +38,7 @@ const getAllVehicles = (query) => {
 
 const getVehicleById = (id) => {
   return new Promise((resolve, reject) => {
-    const queryString = `SELECT v.id, v.name, v.price, v.location, v.capacity, v.   picture, s.name AS 'status_name', v.available_item, c.name AS 'category_name' 
-      FROM vehicles v JOIN categories c ON v.category_id = c.id JOIN status s ON v.status_id = s.id WHERE v.id = ?`;
+    const queryString = `SELECT v.id, v.name, v.price, v.location, v.capacity, v.picture, v.available_item, v.description, c.name AS 'category_name' FROM vehicles v JOIN categories c ON v.category_id = c.id WHERE v.id = ?`;
 
     db.query(queryString, id, (err, results) => {
       if (err) return reject(err);
@@ -48,7 +50,7 @@ const getVehicleById = (id) => {
 const getPopularVehicle = () => {
   return new Promise((resolve, reject) => {
     const queryString =
-      "SELECT t.id, v.name, v.price, v.capacity, t.rating, t.date, v.available_item, FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id WHERE t.rating > 7 ORDER BY t.date ASC";
+      "SELECT t.id, v.name, v.price, v.capacity, t.rating, t.date, v.available_item FROM vehicles v JOIN transactions t ON t.vehicle_id = v.id WHERE t.rating > 7 ORDER BY t.date ASC";
 
     db.query(queryString, (err, results) => {
       if (err) return reject(err);
@@ -68,10 +70,36 @@ const createVehicle = (body) => {
   });
 };
 
-const updateVehicle = (body, params) => {
+const updateVehicle = (req) => {
+  const { body, params, file } = req;
+  let id = params.id;
+  let picture = "";
+  let input;
+  // const host = "http://localhost:8000";
+  // // const imageURL = `/images/${file.filename}`;
+  if (file) {
+    picture += `/images/${file.filename}`;
+    input = {
+      picture,
+    };
+  }
+
+  console.log(file);
+
+  console.log(body);
+  const inputWithoutPicture = { ...body };
+  const inputWithPicture = { ...body, ...input };
+  let newInput = {};
+  if (!picture) {
+    newInput = inputWithoutPicture;
+  } else {
+    newInput = inputWithPicture;
+  }
+
+  console.log(newInput);
   return new Promise((resolve, reject) => {
     const queryString = "UPDATE vehicles SET ? WHERE id = ?";
-    db.query(queryString, [body, params.id], (err, results) => {
+    db.query(queryString, [newInput, id], (err, results) => {
       if (err) return reject(err);
       return resolve(results);
     });

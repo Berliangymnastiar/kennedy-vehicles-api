@@ -64,10 +64,10 @@ const createVehicle = (req, res) => {
 
   let input = { ...body };
   if (file) {
-    const host = "http://localhost:8000";
+    // const host = "http://localhost:8000";
     const imageURL = `/images/${file.filename}`;
     input = {
-      picture: host + imageURL,
+      picture: imageURL,
       ...input,
     };
   }
@@ -83,19 +83,8 @@ const createVehicle = (req, res) => {
 };
 
 const updateVehicle = (req, res) => {
-  const { body, file, params } = req;
-
-  let input = { ...body };
-  if (file) {
-    const host = "http://localhost:8000";
-    const imageURL = `/images/${file.filename}`;
-    input = {
-      picture: host + imageURL,
-      ...input,
-    };
-  }
   vehicleModel
-    .updateVehicle(input, params)
+    .updateVehicle(req)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
       res.status(500).send({

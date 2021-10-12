@@ -66,10 +66,9 @@ const updateUser = (req, res) => {
 
   let input = { ...body };
   if (file) {
-    const host = "http://localhost:8000";
     const imageURL = `/images/${file.filename}`;
     input = {
-      picture: host + imageURL,
+      picture: imageURL,
       ...input,
     };
   }

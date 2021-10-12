@@ -15,14 +15,14 @@ userRouter.get(
 userRouter.get(
   "/:id",
   authMiddlewares.checkToken,
-  authMiddlewares.isAdmin,
+  // authMiddlewares.isAdmin,
   userController.getUserById
 );
 // CREATE DATA USERS
 userRouter.post(
   "/",
   authMiddlewares.checkToken,
-  authMiddlewares.isAdmin,
+  // authMiddlewares.isAdmin,
   userController.createUser
 );
 // UPDATE PASSWORD BY ID
@@ -36,7 +36,7 @@ userRouter.patch(
 userRouter.patch(
   "/:id",
   authMiddlewares.checkToken,
-  authMiddlewares.isAdmin,
+  // authMiddlewares.isAdmin,
   upload.single("picture"),
   userController.updateUser
 );
