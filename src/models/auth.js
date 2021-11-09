@@ -9,12 +9,11 @@ const login = ({ email, password }) => {
     db.query(getPassQs, email, (err, result) => {
       if (err) return reject(err);
       if (!email) return reject("Please input email");
-      if (!result.length) return reject("Email not found");
+      if (!result.length) return reject(404);
       bcrypt.compare(password, result[0].password, (err, isPasswordValid) => {
         if (err) return reject(err);
         if (!password) return reject("Please input password");
-        if (!isPasswordValid)
-          return reject("Login failed wrong email or password!");
+        if (!isPasswordValid) return reject(401);
         const payload = {
           name: result[0].name,
           email,

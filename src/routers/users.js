@@ -32,6 +32,12 @@ userRouter.patch(
   authMiddlewares.isAdmin,
   userController.updatePassword
 );
+
+// FORGOT PASSWORD
+userRouter.post("/forgot-password", userController.forgotPassword);
+userRouter.post("/check-code", userController.checkCodeForgotPassword);
+userRouter.patch("/change-password", userController.changePassword);
+
 // UPDATE USER BY ID
 userRouter.patch(
   "/:id",
