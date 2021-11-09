@@ -47,8 +47,7 @@ const createUser = (body) => {
     const getQuerySelect = "SELECT email FROM users WHERE email = ?";
     db.query(getQuerySelect, body.email, (err, result) => {
       if (err) return reject(err);
-      if (result[0]?.email !== undefined)
-        return reject(new Error("email already taken!"));
+      if (result[0]?.email !== undefined) return reject(409);
       const queryString = "INSERT INTO users SET ?";
       bcrypt.genSalt(10, (err, salt) => {
         if (err) return reject(err);
@@ -80,7 +79,7 @@ const updatePassword = (body, id) => {
         result[0].password,
         (err, isPasswordValid) => {
           if (err) return reject(err);
-          if (!isPasswordValid) return reject("Wrong Password!");
+          if (!isPasswordValid) return reject(403);
           bcrypt.hash(newPassword, 10, (err, hash) => {
             if (err) return reject(err);
             const newPassword = { password: hash };
@@ -91,6 +90,74 @@ const updatePassword = (body, id) => {
           });
         }
       );
+    });
+  });
+};
+
+const forgotPassword = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email } = body;
+
+    const queryString = "SELECT id FROM users WHERE email = ?";
+    db.query(queryString, email, (err, results) => {
+      if (err) return reject(err);
+      if (!results.length) return reject(404);
+      const min = Math.ceil(111111);
+      const max = Math.floor(999999);
+      const code = Math.floor(Math.random() * (max - min) + min);
+      const codeForgotPass =
+        "INSERT INTO forgot_password (user_id, code) VALUES (? ,?)";
+      db.query(codeForgotPass, [results[0].id, code], (err, res) => {
+        if (err) return reject(err);
+        return resolve("Code has sent to database");
+      });
+    });
+  });
+};
+
+const checkCodeForgotPassword = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email, code } = body;
+
+    const queryString = "SELECT id FROM users WHERE email = ?";
+    db.query(queryString, email, (err, results) => {
+      if (err) return reject(err);
+      const id = results[0].id;
+      const checkCode =
+        "SELECT code FROM forgot_password WHERE id = (SELECT max(id) FROM forgot_password) AND user_id = ? AND code = ?";
+      db.query(checkCode, [id, code], (err, res) => {
+        if (err) return reject(err);
+        if (!res.length) return reject(404);
+        return resolve("check code success");
+      });
+    });
+  });
+};
+
+const changePassword = (body) => {
+  return new Promise((resolve, reject) => {
+    const { code, email, password } = body;
+    const queryString = "SELECT id FROM users WHERE email = ?";
+    db.query(queryString, email, (err, result) => {
+      if (err) return reject(err);
+      const id = result[0].id;
+      const checkCode =
+        "SELECT code FROM forgot_password WHERE id = (SELECT max(id) FROM forgot_password) AND user_id = ? AND code = ?";
+      db.query(checkCode, [id, code], (err, res) => {
+        if (err) return reject(err);
+        if (!res.length) return reject(404);
+        const queryUpdatePass = "UPDATE users SET ? WHERE email = ?";
+        bcrypt.hash(password, 10, (err, hash) => {
+          if (err) return reject(err);
+          const newPassword = {
+            password: hash,
+          };
+          db.query(queryUpdatePass, [newPassword, email], (err, result) => {
+            if (err) return reject(err);
+            return resolve("Password sudah diganti");
+          });
+        });
+      });
     });
   });
 };
@@ -121,5 +188,8 @@ module.exports = {
   createUser,
   updatePassword,
   updateUser,
+  forgotPassword,
+  checkCodeForgotPassword,
+  changePassword,
   deleteUser,
 };

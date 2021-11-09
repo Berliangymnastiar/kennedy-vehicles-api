@@ -88,9 +88,49 @@ const updatePassword = (req, res) => {
     .updatePassword(body, params.id)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while update password",
-      });
+      if (err === 403) {
+        return responseHelper.error(res, 403, "Wrong password!");
+      }
+      responseHelper.error(res, 500, err);
+    });
+};
+
+const forgotPassword = (req, res) => {
+  const { body } = req;
+  userModel
+    .forgotPassword(body)
+    .then((data) => responseHelper.success(res, 200, data))
+    .catch((err) => {
+      if (err === 404) {
+        return responseHelper.error(res, 404, "Email not registered");
+      }
+      return responseHelper.error(res, 500, err);
+    });
+};
+
+const checkCodeForgotPassword = (req, res) => {
+  const { body } = req;
+
+  userModel
+    .checkCodeForgotPassword(body)
+    .then((data) => responseHelper.success(res, 200, data))
+    .catch((err) => {
+      if (err === 404) {
+        return responseHelper.error(res, 404, "Code not valid");
+      }
+      return responseHelper.error(res, 500, err);
+    });
+};
+
+const changePassword = (req, res) => {
+  const { body } = req;
+  userModel
+    .changePassword(body)
+    .then((data) =>
+      responseHelper.success(res, 200, "Change password success!")
+    )
+    .catch((err) => {
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -113,5 +153,8 @@ module.exports = {
   createUser,
   updateUser,
   updatePassword,
+  forgotPassword,
+  checkCodeForgotPassword,
+  changePassword,
   deleteUser,
 };

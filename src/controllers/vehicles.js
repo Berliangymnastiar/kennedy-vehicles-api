@@ -29,9 +29,10 @@ const getAllVehicles = (req, res) => {
       responseHelper.success(res, 200, data, info);
     })
     .catch((err) => {
-      res.status(404).send({
-        message: err.message || "data not found",
-      });
+      if (err === 404) {
+        return responseHelper.error(res, 404, "Data not found!");
+      }
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -40,9 +41,7 @@ const getPopularVehicle = (req, res) => {
     .getPopularVehicle()
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while get popular vehicle",
-      });
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -53,9 +52,7 @@ const getVehicleById = (req, res) => {
     .getVehicleById(params.id)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while get the vehicle",
-      });
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -76,9 +73,7 @@ const createVehicle = (req, res) => {
     .createVehicle(input)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while creating vehicle",
-      });
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -87,9 +82,7 @@ const updateVehicle = (req, res) => {
     .updateVehicle(req)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while update data vehicles",
-      });
+      responseHelper.error(res, 500, err);
     });
 };
 
@@ -100,9 +93,7 @@ const deleteVehicle = (req, res) => {
     .deleteVehicle(params.id)
     .then((data) => responseHelper.success(res, 200, data))
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "some error occured while delete data",
-      });
+      responseHelper.error(res, 500, err);
     });
 };
 
